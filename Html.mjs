@@ -35,19 +35,22 @@ function jsonToHtml(json) {
 }
 
 class Html {
-    constructor(p, name, param) {
-        if (p === null && name === 'nav') {
-            Object.assign(this, param)
+    constructor(o,n,p) {
+        
+        if (o && n) {
+            Object.assign(this, {o,n,p})
+            const id = this.id = n + (p ? '_' + p : '');
+            (o.div || (o.div = {}))[id] = this
+        }
+        else if (o === null && n === 'nav') {
+            Object.assign(this, p)
             nav = this
+            this._data = {}
             this.id = 'nav'
-            this.init(name)
+            this.init('nav')
             this.render(nav, 'root')
         }
-        else if (p) {
-            Object.assign(this, { p, name, param })
-            const id = this.id = name + (param ? '_' + param : '');
-            (p.div || (p.div = {}))[id] = this
-        }
+        else error ({Html: this, o, n, p})
     }
     init(p) {
         const fav = document.createElement('link')
@@ -69,9 +72,9 @@ class Html {
     }
     render(o, id = o.id) {
         if (o === this) this.unload(this)
-        else if (o.p && o.p.div && o.p.div[id]) {
-            this.unload(o.p.div[id])
-            o.p.div[id] = o
+        else if (o.o && o.o.div && o.o.div[id]) {
+            this.unload(o.o.div[id])
+            o.o.div[id] = o
         }
         const html_ = this.replace(o)
         const e = this.q(`#${id}`)
@@ -159,7 +162,7 @@ class Html {
         if (this.id === n) return this
         const d = this.div && this.div[n]
         if (d) return d
-        else if (this.p) return this.p.pdiv(n)
+        else if (this.o) return this.o.pdiv(n)
         else return null
     }
     reload = (n) => {
@@ -175,16 +178,16 @@ class Html {
         const t = n.toLowerCase(),
             h = nav._html[t],
             l = nav._link[t],
-            pu = nav._popup[t],
+            pop = nav._popup[t],
             f = nav._form[t]
         if (h) return this.replace(o, h)
         else if (l) {
             const tt = new TT(o, n, p)
             return tt.html()
         }
-        else if (pu) {
-            const pu = new Popup(o, n, p)
-            return pu.html()
+        else if (pop) {
+            const p = new Popup(o, n, p)
+            return p.html()
         }
         else if (f) {
             const fi = new IN(o, n, p)
@@ -196,7 +199,7 @@ class Html {
         }
     }
     setForm = (vs) => {
-        const f = this._p('form'), fm = f && f()
+        const fm = nv._form
         if (vs && fm) Object.keys(vs).forEach(k => {
             if (fm[k]) {
                 const l = this.fe(k)
@@ -212,7 +215,7 @@ class Html {
     }
     getForm = () => {
         let ret = {}
-        const fm = this.frm
+        const fm = this.form
         if (fm) Object.keys(fm).forEach(name => {
             const l = this.fe(name)
             if (l && l.type !== 'button' && l.type !== 'submit') ret[name] = (l.type === 'checkbox' || l.type === 'radio') ? l.checked : l.value
