@@ -1,0 +1,23 @@
+{
+  "name": "node",
+  "version": "2024.08.06",
+  "description": "",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "nodemon server.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-ses": "^3.577.0",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "log4js": "^6.9.1",
+    "pako": "^2.1.0",
+    "sharp": "^0.33.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
