@@ -259,17 +259,6 @@ function registerReq(j, r, a) {
     else resp(j, r, a, { e: j }, 400)
 }
 
-function volReq(j, r, a) {
-    if (j.v && a) {
-        const v = d._vs[j.v], u = d._es[a.email]
-        if (v && a.email === v.email.toLowerCase()) v.i = u.i
-        if (v && (u.admin || u.i === v.i)) {
-            debug({ [v.id]: `${v.first} ${v.last}` })
-            resp(j, r, a, { v })
-        } else resp(j, r, a, { e: v ? 'Unauthorized' : j.v }, 401)
-    } else resp(j, r, a, { e: 'no vol' }, 400)
-}
-
 function delaySend(req) {
     const t = req.time, [h, m] = t ? t.split(':') : []
     if (h && m) {
@@ -294,17 +283,6 @@ function bulksendReq(j, r, a) {
     } else resp(j, r, a, { e: 'Unauthorized' }, 401)
 }
 
-function compReq(j, r, a) {
-    if (j.cid && a.aed) {
-        const c = cs[j.cid]
-        if (c) {
-            const { first, last, i, cid } = c
-            debug(`${cid}: ${first} ${last} i:${i}`)
-            resp(j, r, a, {})
-        } else resp(j, r, a, { e: 'no comp' }, 400)
-    } else resp(j, r, a, { e: 'Unauthorized' }, 401)
-}
-
 function awsSnsReq(req, json, r) {
     if (json.cid && aed) {
         const c = cs[json.cid]
@@ -315,35 +293,10 @@ function awsSnsReq(req, json, r) {
     } else resp(req, r, { error: 'Unauthorized' }, 401)
 }
 
-function photoReq(j, r, a) {
-    const { y, n } = (j.get || j.pub), np = d.ns[a.email],
-        u = np && np[y] && np[y].includes(n)
-    if (j.get) {
-        const pp = d.ps[y][n] || (a.admin && d.photos[y][n]), // public photos for number n
-            op = u && d.photos[y][n]
-        resp(j, r, a, { pp, op })
-    }
-    else if (j.pub) {
-        const ph = j.pub.pn
-        if (d.ps[y]) {
-            if (d.ps[y][n]) {
-                const i = d.ps[y][n].indexOf(ph)
-                if (i === -1) d.ps[y][n].push(ph)
-                else d.ps[y][n].splice(i, 1)
-            }
-            else d.ps[y][n] = [ph]
-        }
-        else d.ps[y] = { [n]: [ph] }
-        const pn = saveF('ps', y, n), pp = d.ps[y][n]
-        debug({ pp })
-        resp(j, r, a, { pp, pn })
-    } else resp(j, r, a, { e: 'no photo' }, 400)
-}
-
 app.post(d.config.url, auth(async (j, r, a) => {
     const reqF = {
         anon: { filesReq, datesReq, loginReq, sendReq, unsubReq, registerReq, testReq },
-        auth: { userReq, volReq, compReq, subReq, saveReq, photoReq, bulksendReq, rmReq }
+        auth: { userReq, subReq, saveReq, bulksendReq, rmReq }
     }
     log.info(a ? a.i : '', 'req->', j.req, j.i ? j.i : '')
     if (reqF.anon[j.req + 'Req']) reqF.anon[j.req + 'Req'](j, r, a)
