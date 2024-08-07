@@ -1,6 +1,6 @@
 const debug = console.log.bind(console),
     error = console.error.bind(console)
-import { saveF, d, rmV } from './files.mjs'
+import { saveF, d} from './files.mjs'
 
 function rmU(email, rm) {
     const u = d._es[email], { i, first, last } = u,

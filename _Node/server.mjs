@@ -1,11 +1,12 @@
 // npm install @aws-sdk/client-ses
-process.title = "Hatchendtri Server"
 const debug = console.log.bind(console)
 import express from 'express'
 import jwt from 'jsonwebtoken'
 import { send, send_list } from './mail.mjs'
-import { load, saveF, log, d, version } from './files.mjs'
+import { load, saveF, log, d} from './files.mjs'
 import { testF } from './testing.mjs'
+
+process.title = d.manifest.name
 
 load()
 const app = express()
@@ -327,14 +328,15 @@ function auth(rH) {
         const j = m.body, h = m.headers
         let a
         if (h.ci) { // cI=>ci
-            const cI = JSON.parse(h.ci)
+            const cI = JSON.parse(h.ci),
+            v=d.manifest.version
             try {
                 a = j.req ? authH(cI) : null
                 if (j.req) {
-                    if (version !== cI.v) {
+                    if (v !== cI.v) {
                         log.info('req->', j.req)
-                        log.info({ version, cI })
-                        resp(j, r, a, { reload: `${version}!=${cI.v}` }, 503)
+                        log.info({ v, cI })
+                        resp(j, r, a, { reload: `${v}!=${cI.v}` }, 503)
                     }
                     else await rH(j, r, a)
                 }
