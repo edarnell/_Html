@@ -35,10 +35,10 @@ function jsonToHtml(json) {
 }
 
 class Html {
-    constructor(o,n,p) {
-        
+    constructor(o, n, p) {
+
         if (o && n) {
-            Object.assign(this, {o,n,p})
+            Object.assign(this, { o, n, p })
             const id = this.id = n + (p ? '_' + p : '');
             (o.div || (o.div = {}))[id] = this
         }
@@ -50,7 +50,7 @@ class Html {
             this.init('nav')
             this.render(nav, 'root')
         }
-        else error ({Html: this, o, n, p})
+        else error({ Html: this, o, n, p })
     }
     init(p) {
         const fav = document.createElement('link')
