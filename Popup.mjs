@@ -5,7 +5,7 @@ import TT from './TT.mjs'
 class Popup extends TT {
     constructor(o, n, p) {
         super(o, n, p)
-        this.id = 'Popup_' + this.n + '_' + this.o.id
+        this.id = 'popup_' + this.n + '_' + this.o.id
         const t = n.toLowerCase()
         this.lk = nav._popup[t]
         if (!this.lk) error({ Popup: this.id })

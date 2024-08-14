@@ -1,5 +1,4 @@
 import puppeteer from 'puppeteer'
-import { JSDOM } from 'jsdom'
 import {
     url, setPage, setDebug, scp, rm, waitForFile, waitSel, sleep,
     uc1, tt, hover, token, unsub, logout, login, debug, name
@@ -27,13 +26,13 @@ describe('LoggedOut', () => {
     afterEach(async () => setDebug(false, true))
     test('Home', async () => {
         await page.goto(url)
-        const html = await page.content(),
-            dom = new JSDOM(html),
-            head = dom.window.document.head.outerHTML,
-            body = dom.window.document.body.outerHTML,
-            css = Array.from(dom.window.document.querySelectorAll('style')).map(s => s.textContent).join('\n')
+        const head = await page.$eval('head', el => el.outerHTML)
+        const body = await page.$eval('body', el => el.outerHTML)
+        const css = await page.$$eval('style', styles => styles.map(s => s.textContent).join('\n'))
+        
         await scp('head.html', head)
         await scp('head.css', css)
-        await scp('body.html', '<link rel="stylesheet" href="head.css">' + body)
+        await scp('body.html', `<link rel="stylesheet" href="head.css">${body}`)
     })
 })
+export {page, browser}

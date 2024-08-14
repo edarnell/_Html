@@ -2,6 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import jwt from 'jsonwebtoken'
 import manifest from '../../public/manifest.json'
+
 const cI = {
     v: manifest.version,
     ts: new Date().toISOString(),
