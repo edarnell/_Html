@@ -37,15 +37,17 @@ function jsonToHtml(json) {
 class Html {
     constructor(o, n, p) {
 
-        if (o && n) {
+        if (o && n && nav) {
             Object.assign(this, { o, n, p })
-            const id = this.id = n + (p ? '_' + p : '');
-            (o.div || (o.div = {}))[id] = this
+            const id = this.id = n
+            if (nav.id[id]) error({ Html: this, o, n, p })
+            else nav._id[id] = this
         }
         else if (o === null && n === 'nav') {
             Object.assign(this, p)
             nav = this
             this._data = {}
+            this._id = {}
             this.id = 'nav'
             this.init('nav')
             this.render(nav, 'root')
@@ -62,14 +64,8 @@ class Html {
         style.innerHTML = this.css
         document.head.appendChild(style)
     }
-    q = (q) => document.querySelector(q)
+    q = (q) => document.querySelector(q) // const l = this.q(`[id*="IN_${n}_"]`)
     qId = (id) => document.getElementById(id)
-    fe = (n, v) => {
-        const l = this.q(`[id*="IN_${n}_"]`)
-        if (!l) error({ fe: n, v })
-        else if (v) l.value = v
-        return l
-    }
     render(o, id = o.id) {
         if (o === this) this.unload(this)
         else if (o.o && o.o.div && o.o.div[id]) {
@@ -98,13 +94,8 @@ class Html {
         }
         const html_ = this.replace(this.pg, `{${pg}}`),
             p = this.qId('page')
-        if (p) { // prevent nested divs with same id
-            const t = document.createElement('div')
-            t.innerHTML = html_
-            const t1 = t.firstChild
-            if (t1.id === pg) p.innerHTML = t1.innerHTML
-            else p.innerHTML = html_
-        }
+            p.innerHTML = html_
+        if (p) p.innerHTML = html_
         else error({ page: this, p, pg })
         requestAnimationFrame(() => {
             this.listen(this.pg) // may need delay for pupeteer
