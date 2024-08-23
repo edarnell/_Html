@@ -127,9 +127,9 @@ class Html {
         return html_ && this.rep(o, html_)
     }
     rep = (o, h) => {
-        let r = /\{([\w_]+)(?:\.([^\s{}]+))?\}/g
+        let r = /\{([^\s{}]+)\}/g
         let ms = Array.from(h.matchAll(r))
-        let rs = ms.map(m => this.links(o, m[1], m[2]))
+        let rs = ms.map(m => this.links(o, m[1]))
         return ms.reduce((res, m, i) => res.replace(m[0], rs[i]), h)
     }
     listen = (p) => {
@@ -179,7 +179,8 @@ class Html {
             h = nav._html[t],
             l = nav._link[t],
             pop = nav._popup[t],
-            f = nav._form[t]
+            f = nav._form[t],
+            v=nav._var[t]
         if (h) return this.replace(o, h)
         else if (l) {
             const tt = new TT(o, n, p)
@@ -192,6 +193,9 @@ class Html {
         else if (f) {
             const fi = new IN(o, n, p)
             return fi.html()
+        }
+        else if (v) {
+            return v
         }
         else {
             error({ Object: this, t, n, p, nav })
