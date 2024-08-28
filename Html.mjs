@@ -96,14 +96,17 @@ class Html {
             if (this.pg) this.unload(this.pg)
             this.pg = new Html(this, pg)
         }
-        const html_ = this.replace(this.pg, `{${pg}}`),
+        const html_ = nav._html[pg], // this.replace(this.pg, `{${pg}}`),
             p = this.qId('page')
-        if (p) { // prevent nested divs with same id
+        if (p && html_) { // prevent nested divs with same id
             const t = document.createElement('div')
-            t.innerHTML = html_
+            t.innerHTML = this.replace(this.pg, html_)
             const t1 = t.firstChild
-            if (t1.id === pg) p.innerHTML = t1.innerHTML
-            else p.innerHTML = html_
+            if (t1.id !== pg) {
+                t.id=pg
+                p.appendChild(t)
+            }
+            else p.innerHTML = t1.innerHTML
         }
         else error({ page: this, p, pg })
         requestAnimationFrame(() => {
@@ -121,10 +124,10 @@ class Html {
         if (data) nav.d.get(data).then(loaded)
     }
     replace = (o, html) => {
-        if (!html && o && o.data) this.checkData(o)
-        const c = html || nav._html[o.id],
-            html_ = (typeof c === 'object') ? this.replace(c) : c
-        return html_ && this.rep(o, html_)
+        //if (!html && o && o.data) this.checkData(o)
+        const c = html || nav._html[o.id]
+            //html_ = (typeof c === 'object') ? this.replace(c) : c
+        return this.rep(o, c)
     }
     rep = (o, h) => {
         let r = /\{([^\s{}]+)\}/g
@@ -176,13 +179,12 @@ class Html {
     }
     links = (o, n, p) => {
         const t = n.toLowerCase(),
-            h = nav._html[t],
             l = nav._link[t],
             pop = nav._popup[t],
             f = nav._form[t],
-            v=nav._var[t]
-        if (h) return this.replace(o, h)
-        else if (l) {
+            v=nav._var[t],
+            h = nav._html[t]
+        if (l) {
             const tt = new TT(o, n, p)
             return tt.html()
         }
@@ -194,9 +196,8 @@ class Html {
             const fi = new IN(o, n, p)
             return fi.html()
         }
-        else if (v) {
-            return v
-        }
+        else if (v) return v
+        else if (h) return this.replace(o, h)
         else {
             error({ Object: this, t, n, p, nav })
             return `<r>{${t}}</r>`
